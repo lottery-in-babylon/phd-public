@@ -1,0 +1,6 @@
+{
+    "[markdown]": {
+      "editor.defaultFormatter": null
+    },
+    "prettier.enable": false
+}
