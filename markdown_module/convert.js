@@ -18,6 +18,7 @@ import { codeCSS,tableCSS,customCSS }  from "./all_css.js";
 
 const inputDir = '../research_workbooks';
 const outputDir = '../dist/research_workbooks';
+const distURL = "https://thelibraryofbabel.in/"
 
 const md = markdownIt({
     html: true,
@@ -48,7 +49,7 @@ md.use(emoji)
     .use(markdownitcontainer, "warning");
 
 
-const convertMarkdownToHtml = (inputPath, outputPath, title) => {
+const convertMarkdownToHtml = (inputPath, outputPath, title, markdownFileName) => {
     const markdown = fs.readFileSync(inputPath, "utf-8");
     const result = md.render(markdown);
     const htmlContent = `
@@ -67,6 +68,9 @@ const convertMarkdownToHtml = (inputPath, outputPath, title) => {
     </head>
     <body>
         <div class="container" style="max-width:800px; margin: 0 auto;">
+            <a href="${distURL}research-workbooks/source/${markdownFileName}">View Markdown</a>
+        </div>
+        <div class="container" style="max-width:800px; margin: 0 auto;">
         ${result}
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -74,6 +78,38 @@ const convertMarkdownToHtml = (inputPath, outputPath, title) => {
     </html>`;
     fs.writeFileSync(outputPath, htmlContent);   
 };
+
+const generateIndexFile = (dirPath, relativePath) => {
+    const items = fs.readdirSync(dirPath).filter(item => !item.startsWith('.'));
+    let links = items.map(item => {
+        const itemPath = path.join(relativePath, item);
+        if (fs.statSync(path.join(dirPath, item)).isDirectory()){
+            return `<li><a href="${itemPath}/index.html">${item}</a></li>`;
+        } else if (item.endsWith('.html')) {
+            return `<li><a href="${itemPath}">${item}</a></li>`;
+        }
+    }).filter(link => link).join('\n');
+
+    const indexPath = path.join(dirPath, 'index.html');
+    const indexContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Index of ${relativePath}</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <style>${codeCSS}</style>  <!-- Include codeCSS -->
+    </head>
+    <body>
+        <div class="container">
+        <h1>Index of ${relativePath}</h1>
+        <ul>
+            ${links}
+        </ul>
+        </div>
+    </body>
+    </html>`;
+    fs.writeFileSync(indexPath, indexContent);
+}
 
 const processDirectory = (srcDir, destDir) => {
     fs.mkdirSync(destDir, { recursive: true });
@@ -88,12 +124,16 @@ const processDirectory = (srcDir, destDir) => {
         } else if (item.endsWith('.md')) {
             const htmlPath = destPath.replace(/\.md$/, '.html');
             const htmlTitle = path.basename(htmlPath).replace(/\.html$/, '');
-            convertMarkdownToHtml(srcPath, htmlPath, htmlTitle);
+            const markDownFileName = path.basename(srcPath);
+            convertMarkdownToHtml(srcPath, htmlPath, htmlTitle, markDownFileName);
         }
     });
+
+    //generateIndexFile(destDir, path.relative(outputDir, destDir));
 };
 
 processDirectory(inputDir, outputDir);
+//generateIndexFile(outputDir, '.');
 //const result = md.render("# Hello, Markdown!");
 
 //console.log(result)
