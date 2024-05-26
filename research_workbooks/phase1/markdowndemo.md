@@ -1,8 +1,4 @@
----
-Markdown Demo
----
-
-# h1 Heading 8-)
+# h1 I am actually not so fond of 8-)
 ## h2 Heading
 ### h3 Heading
 #### h4 Heading

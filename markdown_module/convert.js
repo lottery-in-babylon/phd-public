@@ -67,7 +67,7 @@ const convertMarkdownToHtml = (inputPath, outputPath, title, markdownFileName) =
         </style>
     </head>
     <body>
-        <div class="container" style="max-width:800px; margin: 0 auto;">
+        <div class="container" style="max-width:800px; margin: 10px auto 20px auto;">
             <a href="${distURL}research-workbooks/source/${markdownFileName}">View Markdown</a>
         </div>
         <div class="container" style="max-width:800px; margin: 0 auto;">
